@@ -1,0 +1,26 @@
+
+$CertificateName = "outagemap_cmpco_com_2016"
+$CrtPath = "C:\Certs\outagemap_cmpco_com.crt"
+$PEMPath = "C:\Certs\outagemap_cmpco_com.pem"
+$CACrtPath = "C:\Certs\DigiCertCA_outagemap_cmpco_com.crt"
+$CAPEMPath = "C:\Certs\DigiCertCA_outagemap_cmpco_com.pem"
+$PrivateKey = "C:\Certs\outagemap.cmpco.com.key"
+$IAM
+
+#Convert Certs to PEM
+#Change .CRT to .PEM
+C:\OpenSSL-Win32\bin\openssl.exe x509 -in $CrtPath -out $PEMPath -outform PEM
+C:\OpenSSL-Win32\bin\openssl.exe x509 -in $CACrtPath -out $CAPEMPath -outform PEM
+#Change .Key to .PEM
+C:\OpenSSL-Win32\bin\openssl.exe rsa -in $PrivateKey -outform PEM -out $PrivateKey
+
+#CHange IAM Account
+aws configure
+
+#Elastic Load Balancer
+aws iam upload-server-certificate --server-certificate-name $CertificateName  --certificate-body file://$PEMPath --private-key file://$PrivateKey --certificate-chain file://$CAPEMPath 
+
+#Cloudfront
+aws iam upload-server-certificate --server-certificate-name outagemap_cmpco_com_2016 --certificate-body file://$PEMPath --private-key file://$PrivateKey --certificate-chain file://CAPEMPath --path /cloudfront/maine-production/
+
+
